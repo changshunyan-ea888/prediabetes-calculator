@@ -117,14 +117,14 @@ build_risk_curve_plot <- function(new_patient, pred_res_obj) {
       plot.subtitle = element_text(color = "#667085")
     ) +
     labs(
-      title = "Predicted cumulative prediabetes risk over time",
-      subtitle = "Patient-specific survival prediction",
+      title = "Predicted cumulative risk of FPG-defined incident prediabetes over time",
+      subtitle = "Patient-specific time-dependent prediction",
       x = "Follow-up time (years)",
       y = "Cumulative risk"
     )
 }
 
-# 修改title---------------
+# 修改title
 
 build_shap_plot <- function(shap_one) {
   sv_waterfall(
@@ -146,7 +146,7 @@ build_shap_plot <- function(shap_one) {
     )
 }
 
-# 修改title---------------
+# 修改title
 
 build_report_html <- function(new_patient, pred_obj) {
   risk3 <- round(pred_obj$res_3$event_prob * 100, 1)
@@ -156,7 +156,7 @@ build_report_html <- function(new_patient, pred_obj) {
   grp   <- get_risk_group(pred_obj$res_5$risk_score)
   
   html <- paste0(
-    "<html><head><meta charset='UTF-8'><title>Prediabetes Risk Report</title>",
+    "<html><head><meta charset='UTF-8'><title>FPG-Defined Incident Prediabetes Risk Report</title>",
     "<style>",
     "body{font-family:Arial,Helvetica,sans-serif;margin:40px;color:#2f2f3a;line-height:1.7;}",
     "h1{color:#303241;} h2{color:#444;} ",
@@ -166,7 +166,7 @@ build_report_html <- function(new_patient, pred_obj) {
     ".badge{display:inline-block;padding:6px 12px;border-radius:999px;color:#fff;font-weight:700;background:#ff4d4f;}",
     ".note{color:#667085;font-size:14px;}",
     "</style></head><body>",
-    "<h1>Prediabetes Risk Prediction Report</h1>",
+    "<h1>FPG-Defined Incident Prediabetes Risk Prediction Report</h1>",
     "<p>This report is generated from a time-dependent model using five predictors.</p>",
     
     "<h2>Patient Inputs</h2>",
@@ -182,13 +182,13 @@ build_report_html <- function(new_patient, pred_obj) {
     "<h2>Prediction Summary</h2>",
     "<p><b>Predicted risk score:</b> ", score, "</p>",
     "<p><b>Risk group:</b> <span class='badge'>", grp, "</span></p>",
-    "<p><b>3-year risk of developing Prediabetes:</b> ", risk3, "%</p>",
-    "<p><b>4-year risk of developing Prediabetes:</b> ", risk4, "%</p>",
-    "<p><b>5-year risk of developing Prediabetes:</b> ", risk5, "%</p>",
+    "<p><b>3-year risk of FPG-defined incident prediabetes:</b> ", risk3, "%</p>",
+    "<p><b>4-year risk of FPG-defined incident prediabetes:</b> ", risk4, "%</p>",
+    "<p><b>5-year risk of FPG-defined incident prediabetes:</b> ", risk5, "%</p>",
     
     "<h2>Interpretation</h2>",
     "<p>According to the time-dependent model, this patient is classified as <b>", grp,
-    "</b>. The estimated cumulative risk of developing Prediabetes is <b>", risk3,
+    "</b>. The estimated cumulative risk of developing FPG-defined incident prediabetes is <b>", risk3,
     "%</b> at 3 years, <b>", risk4, "%</b> at 4 years, and <b>", risk5,
     "%</b> at 5 years.</p>",
     
@@ -343,10 +343,10 @@ ui <- page_fluid(
   fluidRow(
     column(
       width = 8,
-      div(class = "main-title", "Risk calculator for incident prediabetes"),
+      div(class = "main-title", "Risk calculator for FPG-defined incident prediabetes"),
       div(
         class = "subtitle-note",
-        "Based on a time-dependent model and individualized SHAP explanation"
+        "Based on a time-dependent model for FPG-defined incident prediabetes with individualized SHAP explanation"
       )
     ),
     column(
@@ -414,7 +414,7 @@ ui <- page_fluid(
         
         div(
           class = "small-note",
-          "Inputs should be entered using the same variable definitions as in the training dataset."
+          "Predicted risk refers to FPG-defined incident prediabetes, defined by follow-up FPG 5.6 to <7.0 mmol/L among individuals with baseline FPG <5.6 mmol/L. Inputs should use the same variable definitions as in the training dataset."
         )
       )
     ),
@@ -427,7 +427,7 @@ ui <- page_fluid(
           width = 4,
           div(
             class = "metric-box",
-            div(class = "metric-label", "3-year risk of developing Prediabetes"),
+            div(class = "metric-label", "3-year risk of FPG-defined incident prediabetes"),
             div(class = "metric-value", textOutput("risk_3y")),
             div(class = "metric-sub", "Predicted cumulative event probability")
           )
@@ -436,7 +436,7 @@ ui <- page_fluid(
           width = 4,
           div(
             class = "metric-box",
-            div(class = "metric-label", "4-year risk of developing Prediabetes"),
+            div(class = "metric-label", "4-year risk of FPG-defined incident prediabetes"),
             div(class = "metric-value", textOutput("risk_4y")),
             div(class = "metric-sub", "Predicted cumulative event probability")
           )
@@ -445,7 +445,7 @@ ui <- page_fluid(
           width = 4,
           div(
             class = "metric-box",
-            div(class = "metric-label", "5-year risk of developing Prediabetes"),
+            div(class = "metric-label", "5-year risk of FPG-defined incident prediabetes"),
             div(class = "metric-value", textOutput("risk_5y")),
             div(class = "metric-sub", "Predicted cumulative event probability")
           )
@@ -486,7 +486,7 @@ ui <- page_fluid(
         plotOutput("risk_curve", height = "320px"),
         div(
           class = "plot-caption",
-          "Cumulative probability of prediabetes development during the follow-up period."
+          "Cumulative probability of FPG-defined incident prediabetes during follow-up."
         )
       ),
       
@@ -578,7 +578,7 @@ server <- function(input, output, session) {
     txt <- paste0(
       "According to the time-dependent model, this patient is classified as <b>",
       grp,
-      "</b>. The estimated cumulative risk of developing <b>Prediabetes</b> is <b>",
+      "</b>. The estimated cumulative risk of developing <b>FPG-defined incident prediabetes</b> is <b>",
       round(risk3, 1), "%</b> at 3 years, <b>",
       round(risk4, 1), "%</b> at 4 years, and <b>",
       round(risk5, 1), "%</b> at 5 years. ",
@@ -602,7 +602,7 @@ server <- function(input, output, session) {
   
   output$download_curve <- downloadHandler(
     filename = function() {
-      paste0("Prediabetes_risk_curve_", Sys.Date(), ".png")
+      paste0("FPG_defined_prediabetes_risk_curve_", Sys.Date(), ".png")
     },
     content = function(file) {
       p <- build_risk_curve_plot(pred_res()$new_patient, pred_res())
@@ -615,7 +615,7 @@ server <- function(input, output, session) {
   
   output$download_shap <- downloadHandler(
     filename = function() {
-      paste0("Prediabetes_SHAP_plot_", Sys.Date(), ".png")
+      paste0("FPG_defined_prediabetes_SHAP_plot_", Sys.Date(), ".png")
     },
     content = function(file) {
       p <- build_shap_plot(pred_res()$shap_one)
@@ -628,7 +628,7 @@ server <- function(input, output, session) {
   
   output$download_csv <- downloadHandler(
     filename = function() {
-      paste0("Prediabetes_prediction_results_", Sys.Date(), ".csv")
+      paste0("FPG_defined_prediabetes_prediction_results_", Sys.Date(), ".csv")
     },
     content = function(file) {
       new_patient <- pred_res()$new_patient
@@ -643,9 +643,9 @@ server <- function(input, output, session) {
         familyhistroyofdiabetes = new_patient$familyhistroyofdiabetes,
         risk_score = round(score, 6),
         risk_group = grp,
-        IFGFPG_risk_3y = round(pred_res()$res_3$event_prob, 6),
-        IFGFPG_risk_4y = round(pred_res()$res_4$event_prob, 6),
-        IFGFPG_risk_5y = round(pred_res()$res_5$event_prob, 6)
+        FPG_defined_prediabetes_risk_3y = round(pred_res()$res_3$event_prob, 6),
+        FPG_defined_prediabetes_risk_4y = round(pred_res()$res_4$event_prob, 6),
+        FPG_defined_prediabetes_risk_5y = round(pred_res()$res_5$event_prob, 6)
       )
       
       write.csv(out_df, file, row.names = FALSE, fileEncoding = "UTF-8")
@@ -657,7 +657,7 @@ server <- function(input, output, session) {
   
   output$download_report <- downloadHandler(
     filename = function() {
-      paste0("Prediabetes_prediction_report_", Sys.Date(), ".html")
+      paste0("FPG_defined_prediabetes_prediction_report_", Sys.Date(), ".html")
     },
     content = function(file) {
       html <- build_report_html(pred_res()$new_patient, pred_res())
